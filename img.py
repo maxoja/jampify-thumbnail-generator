@@ -1,12 +1,22 @@
 from PIL import Image, ImageDraw, ImageFont
+import config
 
 
 def crop(img: Image) -> Image:
-    # (x, y, width, height)
-    x = 100
-    y = 150
-    w = 854
-    h = 480
+    o_w, o_h = img.size
+    o_ratio = o_w/o_h
+
+    if config.CROP_RATIO > o_ratio:
+        max_w = o_w
+        max_h = max_w / config.CROP_RATIO
+    else:
+        max_h = o_h
+        max_w = max_h * config.CROP_RATIO
+
+    x = o_w * config.CROP_OFFSET[0]
+    y = o_h * config.CROP_OFFSET[1]
+    w = max_w * config.CROP_SCALE
+    h = max_h * config.CROP_SCALE
     x2 = x + w
     y2 = y + h
     crop_area = (x, y, x2, y2)

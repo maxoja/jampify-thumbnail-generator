@@ -1,2 +1,7 @@
 IMG_TYPES = ["png"]
 FONT_TYPES = ["ttf"]
+
+CROP_RATIO_TUPLE = (16, 9)
+CROP_RATIO = 16/9
+CROP_SCALE = 0.9
+CROP_OFFSET = (0.1, 0.21)
