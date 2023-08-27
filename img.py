@@ -1,5 +1,15 @@
 from PIL import Image, ImageDraw, ImageFont
+from enums import TitleConfig, VertAlignment, HorizontalAlignment
 import config
+
+
+def crop_box_from_pins(size: tuple, scale_based_crop: tuple) -> tuple:
+    w, h = size
+    cx1, cy1, cx2, cy2 = scale_based_crop
+    x1, x2 = w*cx1, w*cx2
+    y1, y2 = h*cy1, w*cy2
+    # might need to change to x1, y1, w, h
+    return x1, y1, x2, y2
 
 
 def crop(img: Image) -> Image:
@@ -23,24 +33,33 @@ def crop(img: Image) -> Image:
     return img.crop(crop_area)
 
 
-def add_text(img: Image, font_path: str, artist: str, song_title: str, extract_mode: str) -> Image:
+def draw_text(img: Image, font_path: str, text: str, text_config) -> Image:
     img = img.copy()
-    text_title = f'{artist} - {song_title}'
-    text_extract = f'{extract_mode}'
-    title_font_size = 70
-    title_extract_size = 50
-    text_position = (50, 50)  # (x, y)
-    # text_clr = (255, 255, 255)
-    text_clr = 255
+    bx1, by1, bx2, by2 = crop_box_from_pins(img.size, text_config[TitleConfig.DRAW_AREA])
+    bw, bh = bx2 - bx1, by2 - by1
 
-    font = ImageFont.truetype(font_path, title_font_size)
-    draw = ImageDraw.Draw(img)
+    best_font_size = 1
+    while True:
+        font = ImageFont.truetype(font_path, best_font_size)
+        draw = ImageDraw.Draw(img)
+        print(text, font, best_font_size)
+        _, _, w, h = draw.textbbox((0, 0), text, font=font)
+        maxed_out = w > bw or h > bh
+        best_font_size += -1 if maxed_out else 1
+        if maxed_out:
+            break
 
-    # Calculate the position to place the text
-    text_width, text_height = draw.textsize(text_title, font=font)
-    x, y = text_position
-    draw.text((x, y), text_title, fill=text_clr, font=font)
+    if text_config[TitleConfig.H_ALIGN] is HorizontalAlignment.CENTER:
+        final_x = (bx1 + bx2)/2 - w/2
+    else:
+        raise Exception(f'{text_config[TitleConfig.H_ALIGN]} is not supported')
 
+    if text_config[TitleConfig.V_ALIGN] is VertAlignment.TOP:
+        final_y = by1
+    else:
+        raise Exception(f'{text_config[TitleConfig.V_ALIGN]} is not supported')
+
+    draw.text((final_x, final_y), text, font=font, fill=255)
     return img
 
 
@@ -119,5 +138,5 @@ def process(img_paths: [str], font_paths: [str], artist: str, song_title: str,  
     img = Image.open(img_paths[0])
     img = crop(img)
     img = apply_vignette(img)
-    img = add_text(img, font_paths[0], artist, song_title, extract_mode)
+    img = draw_text(img, font_paths[0], f'{artist} - {song_title}', config.TEXT_TITLE)
     return img
