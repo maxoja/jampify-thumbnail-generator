@@ -82,15 +82,14 @@ def apply_vignette(img: Image):
     grey = img_diff.load_greyscale_image(img)
     height = grey['height']
     width = grey['width']
-    extra_width = width*2
-    extra_height = height*2
-    print(width, height)
+    kernel_width = width*2
+    kernel_height = height*2
 
     center_x = int((config.VIGNETTE_CENTER[0]-0.5) * width)
     center_y = int((config.VIGNETTE_CENTER[1]-0.5) * height)
 
-    Kx = img_diff.getGaussianKernel(width, config.VIGNETTE_SCALE[0])
-    Ky = img_diff.getGaussianKernel(height, config.VIGNETTE_SCALE[1])
+    Kx = img_diff.getGaussianKernel(kernel_width, config.VIGNETTE_SCALE[0]/2)
+    Ky = img_diff.getGaussianKernel(kernel_height, config.VIGNETTE_SCALE[1]/2)
     K = [k1 * k2 for k1 in Ky for k2 in Kx]
     # K = [math.pow(k, config.VIGNETTE_STR) for k in K]
 
@@ -102,18 +101,21 @@ def apply_vignette(img: Image):
     min_k = min(K)
     # apply per pixel
     pixels = []
-    for i, value in zip(range(len(K)), grey['pixels']):
-        x = i % width
-        y = i // width
-        coeff_i = i - center_x - center_y * width
+    for y in range(height):
+        for x in range(width):
+            x_kernel = kernel_width//4 + x - center_x
+            y_kernel = kernel_height//4 + y - center_y
+            i_kernel = y_kernel*kernel_width + x_kernel
+            i_img = y*width + x
+            value = grey['pixels'][i_img]
 
-        if x - center_x < 0 or x - center_x >= width \
-            or y - center_y < 0 or y - center_y >= height:
-            coeff = min_k
-        else:
-            coeff = K[coeff_i]
+            if x_kernel < 0 or x_kernel > kernel_width \
+                or y_kernel < 0 or y_kernel > kernel_height:
+                coeff = min_k
+            else:
+                coeff = K[i_kernel]
 
-        pixels.append(math.pow(coeff, config.VIGNETTE_STR) * value)
+            pixels.append(math.pow(coeff, config.VIGNETTE_STR) * value)
     im = {'height': height, 'width': width, 'pixels': pixels}
     round_and_clip_image(im)
     out = Image.new(mode='L', size=(im['width'], im['height']))
