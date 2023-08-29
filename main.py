@@ -8,6 +8,7 @@ import config
 import utils
 import img
 
+
 def filter_extension(path: str, extensions: [str]) -> bool:
     return path.split('.')[-1].lower() in extensions
 

@@ -1,6 +1,10 @@
+import math
+
 from PIL import Image, ImageDraw, ImageFont
+
 from enums import TitleConfig, VertAlignment, HorizontalAlignment
 import config
+import img_diff
 
 
 def crop_box_from_pins(size: tuple, scale_based_crop: tuple) -> tuple:
@@ -74,59 +78,42 @@ def round_and_clip_image(image):
         image['pixels'][i] = round(color)
 
 
-# HELPER FUNCTIONS FOR LOADING AND SAVING COLOR IMAGES
-def load_greyscale_image(img: Image):
-    """
-    Loads an image from the given file and returns a dictionary
-    representing that image.  This also performs conversion to greyscale.
-
-    Invoked as, for example:
-       i = load_image('test_images/cat.png')
-    """
-    img_data = img.getdata()
-    if img.mode.startswith('RGB'):
-        pixels = [round(.299 * p[0] + .587 * p[1] + .114 * p[2])
-                  for p in img_data]
-    elif img.mode == 'LA':
-        pixels = [p[0] for p in img_data]
-    elif img.mode == 'L':
-        pixels = list(img_data)
-    else:
-        raise ValueError('Unsupported image mode: %r' % img.mode)
-    w, h = img.size
-    return {'height': h, 'width': w, 'pixels': pixels}
-
-
 def apply_vignette(img: Image):
-    grey = load_greyscale_image(img)
+    grey = img_diff.load_greyscale_image(img)
     height = grey['height']
     width = grey['width']
-    import math
-    # first, compute the Gaussian Kernel
-    # https://docs.opencv.org/2.4/modules/imgproc/doc/filtering.html#Mat%20getGaussianKernel(int%20ksize,%20double%20sigma,%20int%20ktype)
-    def getGaussianKernel(ksize):
-        sigma = 0.4 * ((ksize - 1) * 0.5 - 1) + 0.8
-        kernel = []
-        scale_factor = 0
-        for i in range(ksize):
-            coeff = math.e ** (-((i - (ksize - 1) / 2) ** 2) / (2 * sigma ** 2))
-            kernel.append(coeff)
-            scale_factor += coeff
-        for i in range(ksize): kernel[i] /= scale_factor
-        return kernel
+    extra_width = width*2
+    extra_height = height*2
+    print(width, height)
 
-    Kx = getGaussianKernel(width)
-    Ky = getGaussianKernel(height)
+    center_x = int((config.VIGNETTE_CENTER[0]-0.5) * width)
+    center_y = int((config.VIGNETTE_CENTER[1]-0.5) * height)
+
+    Kx = img_diff.getGaussianKernel(width, config.VIGNETTE_SCALE[0])
+    Ky = img_diff.getGaussianKernel(height, config.VIGNETTE_SCALE[1])
     K = [k1 * k2 for k1 in Ky for k2 in Kx]
+    # K = [math.pow(k, config.VIGNETTE_STR) for k in K]
+
     # http://mathworld.wolfram.com/FrobeniusNorm.html
     # compute the Frobenius matrix norm
     norm = sum(i ** 2 for i in K)
     norm = math.sqrt(norm)
     K = [i * 255 / norm for i in K]
+    min_k = min(K)
     # apply per pixel
     pixels = []
-    for coeff, value in zip(K, grey['pixels']):
-        pixels.append(coeff * value)
+    for i, value in zip(range(len(K)), grey['pixels']):
+        x = i % width
+        y = i // width
+        coeff_i = i - center_x - center_y * width
+
+        if x - center_x < 0 or x - center_x >= width \
+            or y - center_y < 0 or y - center_y >= height:
+            coeff = min_k
+        else:
+            coeff = K[coeff_i]
+
+        pixels.append(math.pow(coeff, config.VIGNETTE_STR) * value)
     im = {'height': height, 'width': width, 'pixels': pixels}
     round_and_clip_image(im)
     out = Image.new(mode='L', size=(im['width'], im['height']))
