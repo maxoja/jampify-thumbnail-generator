@@ -36,3 +36,19 @@ def load_greyscale_image(img: Image):
         raise ValueError('Unsupported image mode: %r' % img.mode)
     w, h = img.size
     return {'height': h, 'width': w, 'pixels': pixels}
+
+
+def load_color_image(img: Image):
+    """ works like load_greyscale_image but not convert to greyscale"""
+    img_data = img.getdata()
+    if img.mode.startswith('RGB'):
+        pixels = [[ p[0], p[1], p[2] ] for p in img_data]
+    elif img.mode == 'LA':
+        pixels = [[ p[0], p[0], p[0] ] for p in img_data]
+    elif img.mode == 'L':
+        pixels = [[p, p, p ] for p in img_data]
+    else:
+        raise ValueError('Unsupported image mode: %r' % img.mode)
+    w, h = img.size
+    return {'height': h, 'width': w, 'pixels': pixels}
+

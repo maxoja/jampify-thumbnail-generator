@@ -25,6 +25,6 @@ if __name__ == '__main__':
     print('input images', img_paths)
     print('input fonts', font_paths)
 
-    out_img = img.process(img_paths, font_paths, "Adele", "Easy On Me", "Vocal Only")
+    out_img = img.process(img_paths, font_paths, "Adele", "Easy On Me", "Vocal Only", 1)
     out_img.show()
 
