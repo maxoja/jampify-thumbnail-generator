@@ -63,6 +63,7 @@ def draw_text(img: Image, font_path: str, text: str, text_config) -> Image:
     else:
         raise Exception(f'{text_config[TitleConfig.V_ALIGN]} is not supported')
 
+    # add rgb to text
     draw.text((final_x, final_y), text, font=font, fill=(100, 150, 150))
     return img
 
@@ -76,23 +77,31 @@ def round_and_clip_image(image):
         if type(color) is int:
             image['pixels'][i] = round_image(color)
         elif type(color) is list:
+            # for RGB format
             temp_tuple = []
-            for j, color_value in enumerate(color):
+            for color_value in color:
+                # color must have three values for RGB
                 temp_tuple.append(round_image(color_value))
+            # convert list to tuple because putdata() requires tuple or int
             image['pixels'][i] = tuple(temp_tuple)
         else:
             raise Exception(f'Class is not supported: {color}')
         
 
 def round_image(color: int):
+    """
+    force integers to be in the range [0, 255]
+    """
     if color < 0: color = 0
     if color > 255: color = 255
     return round(color)
+
 
 def apply_vignette(img: Image, mode: str):
     if mode == "L":
         grey = img_diff.load_greyscale_image(img)
     elif mode == "RGB":
+        # for RGB format
         grey = img_diff.load_color_image(img)
     else:
         raise Exception(f'Image mode is not supported')
@@ -134,6 +143,7 @@ def apply_vignette(img: Image, mode: str):
             if mode == "L":
                 pixels.append(math.pow(coeff, config.VIGNETTE_STR) * value)
             elif mode == "RGB":
+                # apply vignette to each color (Red, Green, Blue)
                 pixels.append([math.pow(coeff, config.VIGNETTE_STR) * value_a for value_a in value])
     im = {'height': height, 'width': width, 'pixels': pixels}
     round_and_clip_image(im)

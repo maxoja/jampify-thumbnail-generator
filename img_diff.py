@@ -39,13 +39,19 @@ def load_greyscale_image(img: Image):
 
 
 def load_color_image(img: Image):
-    """ works like load_greyscale_image but not convert to greyscale"""
+    """ 
+    Loads an image from the given file and returns a dictionary
+    representing that image. This transforms grayscale into the RGB format.
+    """
     img_data = img.getdata()
     if img.mode.startswith('RGB'):
+        # p[0] is red, p[1] is green, p[2] is blue
         pixels = [[ p[0], p[1], p[2] ] for p in img_data]
     elif img.mode == 'LA':
+        # p[0] is the luminance, p[1] is the alpha
         pixels = [[ p[0], p[0], p[0] ] for p in img_data]
     elif img.mode == 'L':
+        # p is the luminance
         pixels = [[p, p, p ] for p in img_data]
     else:
         raise ValueError('Unsupported image mode: %r' % img.mode)

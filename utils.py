@@ -4,6 +4,7 @@ def get_absolute_file_paths(directory_path):
     file_paths = []
 
     if os.name == "nt":
+        # for windows
         directory_path = directory_path.replace("/", "\\")
 
     for root, dirs, files in os.walk(directory_path):
