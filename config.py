@@ -1,4 +1,14 @@
+import os
 from enums import TitleConfig, VertAlignment, HorizontalAlignment
+
+IN_DIR = os.getcwd() + "/input"
+OUT_DIR = os.getcwd() + "/output"
+
+ARTIST = "Paramore"
+SONG = "Last Hope (Live)"
+EXTRACT_MODE = "Instrumental Non Vocal"
+# Vocal Only
+# Instrumental Non Vocal
 
 IMG_TYPES = ["png"]
 FONT_TYPES = ["ttf"]
