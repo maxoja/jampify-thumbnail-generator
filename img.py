@@ -132,4 +132,5 @@ def process(img_paths: [str], font_paths: [str], artist: str, song_title: str,  
     img = crop(img)
     img = apply_vignette(img)
     img = draw_text(img, font_paths[0], f'{artist} - {song_title}', config.TEXT_TITLE)
+    img = draw_text(img, font_paths[0], f'{extract_mode}', config.TEXT_EXTRACT)
     return img
