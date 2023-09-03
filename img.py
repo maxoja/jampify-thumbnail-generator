@@ -55,11 +55,15 @@ def draw_text(img: Image, font_path: str, text: str, text_config) -> Image:
 
     if text_config[TitleConfig.H_ALIGN] is HorizontalAlignment.CENTER:
         final_x = (bx1 + bx2)/2 - w/2
+    elif text_config[TitleConfig.H_ALIGN] is HorizontalAlignment.RIGHT:
+        final_x = bx2 - w
     else:
         raise Exception(f'{text_config[TitleConfig.H_ALIGN]} is not supported')
 
     if text_config[TitleConfig.V_ALIGN] is VertAlignment.TOP:
         final_y = by1
+    elif text_config[TitleConfig.V_ALIGN] is VertAlignment.CENTER:
+        final_y = (by1 + by2)/2 - h/2
     else:
         raise Exception(f'{text_config[TitleConfig.V_ALIGN]} is not supported')
 
