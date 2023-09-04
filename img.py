@@ -63,8 +63,7 @@ def draw_text(img: Image, font_path: str, text: str, text_config) -> Image:
     else:
         raise Exception(f'{text_config[TitleConfig.V_ALIGN]} is not supported')
 
-    # add rgb to text
-    draw.text((final_x, final_y), text, font=font, fill=(100, 150, 150))
+    draw.text((final_x, final_y), text, font=font, fill=(255, 255, 255))
     return img
 
 
@@ -77,10 +76,8 @@ def round_and_clip_image(image):
         if type(color) is int:
             image['pixels'][i] = round_image(color)
         elif type(color) is list:
-            # for RGB format
             temp_tuple = []
             for color_value in color:
-                # color must have three values for RGB
                 temp_tuple.append(round_image(color_value))
             # convert list to tuple because putdata() requires tuple or int
             image['pixels'][i] = tuple(temp_tuple)
@@ -101,7 +98,6 @@ def apply_vignette(img: Image, mode: str):
     if mode == "L":
         grey = img_diff.load_greyscale_image(img)
     elif mode == "RGB":
-        # for RGB format
         grey = img_diff.load_color_image(img)
     else:
         raise Exception(f'Image mode is not supported')
@@ -143,7 +139,6 @@ def apply_vignette(img: Image, mode: str):
             if mode == "L":
                 pixels.append(math.pow(coeff, config.VIGNETTE_STR) * value)
             elif mode == "RGB":
-                # apply vignette to each color (Red, Green, Blue)
                 pixels.append([math.pow(coeff, config.VIGNETTE_STR) * value_a for value_a in value])
     im = {'height': height, 'width': width, 'pixels': pixels}
     round_and_clip_image(im)
@@ -152,10 +147,18 @@ def apply_vignette(img: Image, mode: str):
     return out
 
 
-def process(img_paths: [str], font_paths: [str], artist: str, song_title: str,  extract_mode: str, color_mode: int) -> Image:
-    color = ["L", "RGB"]
+def process(img_paths: [str], font_paths: [str], artist: str, song_title: str,  extract_mode: str, color_mode: str) -> Image:
+    
     img = Image.open(img_paths[0])
     img = crop(img)
-    img = apply_vignette(img, color[color_mode])
+    img = apply_vignette(img, color_mode)
     img = draw_text(img, font_paths[0], f'{artist} - {song_title}', config.TEXT_TITLE)
     return img
+
+
+def save_image(img: Image, out_path: str, w_dpi: int, h_dpi: int ):
+    # print(out_path)
+    
+    img.thumbnail((w_dpi, h_dpi))
+    img.save(out_path)
+    # img.save(out_path, dpi=(h_dpi, w_dpi))

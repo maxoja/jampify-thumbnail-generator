@@ -25,7 +25,10 @@ if __name__ == '__main__':
     print('input images', img_paths)
     print('input fonts', font_paths)
 
-    # the last argument is a type of image [black/white = 0, rgb = 1]
-    out_img = img.process(img_paths, font_paths, "Adele", "Easy On Me", "Vocal Only", 1)
+    out_img = img.process(img_paths, font_paths, "Adele", "Easy On Me", "Vocal Only", config.COLOR_MODE[1])
     out_img.show()
+
+    w_dpi = 1200
+    h_dpi = 700
+    img.save_image(out_img, os.path.join(os.path.dirname(img_paths[0]), "output.png"), w_dpi, h_dpi)
 

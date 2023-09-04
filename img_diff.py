@@ -45,13 +45,10 @@ def load_color_image(img: Image):
     """
     img_data = img.getdata()
     if img.mode.startswith('RGB'):
-        # p[0] is red, p[1] is green, p[2] is blue
         pixels = [[ p[0], p[1], p[2] ] for p in img_data]
     elif img.mode == 'LA':
-        # p[0] is the luminance, p[1] is the alpha
         pixels = [[ p[0], p[0], p[0] ] for p in img_data]
     elif img.mode == 'L':
-        # p is the luminance
         pixels = [[p, p, p ] for p in img_data]
     else:
         raise ValueError('Unsupported image mode: %r' % img.mode)
