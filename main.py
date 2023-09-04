@@ -25,7 +25,7 @@ if __name__ == '__main__':
     print('input images', img_paths)
     print('input fonts', font_paths)
 
-    out_img = img.process(img_paths, font_paths, "Adele", "Easy On Me", "Vocal Only", config.COLOR_MODE[1])
+    out_img = img.process(img_paths, font_paths, config.ARTIST, config.SONG, config.EXTRACT_MODE, config.COLOR_MODE[1])
     out_img.show()
 
     w_dpi = 1200
