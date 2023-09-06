@@ -1,4 +1,14 @@
+import os
 from enums import TitleConfig, VertAlignment, HorizontalAlignment
+
+IN_DIR = os.getcwd() + "/input"
+OUT_DIR = os.getcwd() + "/output"
+
+ARTIST = "Paramore"
+SONG = "Last Hope (Live)"
+EXTRACT_MODE = "Instrumental Non Vocal"
+# Vocal Only
+# Instrumental Non Vocal
 
 IMG_TYPES = ["png"]
 FONT_TYPES = ["ttf"]
@@ -17,13 +27,13 @@ COLOR_MODES = ("L", "RGB")
 COLOR_MODE = COLOR_MODES[1]
 
 TEXT_TITLE = {
-    TitleConfig.DRAW_AREA: (0.1, 0.125, 0.9, 1),
+    TitleConfig.DRAW_AREA: (0.1, 0, 0.9, 0.25),
     TitleConfig.H_ALIGN: HorizontalAlignment.CENTER,
-    TitleConfig.V_ALIGN: VertAlignment.TOP
+    TitleConfig.V_ALIGN: VertAlignment.CENTER
 }
 
 TEXT_EXTRACT = {
-    TitleConfig.DRAW_AREA: (0.5, 0.5, 0.8, 0.8),
-    TitleConfig.H_ALIGN: HorizontalAlignment.RIGHT,
+    TitleConfig.DRAW_AREA: (0.55, 0.55, 0.9, 0.8),
+    TitleConfig.H_ALIGN: HorizontalAlignment.CENTER,
     TitleConfig.V_ALIGN: VertAlignment.TOP
 }

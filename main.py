@@ -19,14 +19,13 @@ def get_input_file_paths(file_paths: [str], extensions: [str]) -> [str]:
 
 if __name__ == '__main__':
     current_working_dir = os.getcwd()
-    input_files = utils.get_absolute_file_paths(current_working_dir + "/input")
+    input_files = utils.get_absolute_file_paths(config.IN_DIR)
     img_paths = get_input_file_paths(input_files, config.IMG_TYPES)
     font_paths = get_input_file_paths(input_files, config.FONT_TYPES)
     print('input images', img_paths)
     print('input fonts', font_paths)
 
     out_img = img.process(img_paths, font_paths, config.ARTIST, config.SONG, config.EXTRACT_MODE, config.COLOR_MODE)
-    out_img.show()
 
     if not out_img.mode.startswith('RGB'):
         out_img = out_img.convert('RGB')
