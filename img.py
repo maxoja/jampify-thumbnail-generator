@@ -85,7 +85,7 @@ def round_and_clip_image(image):
             raise Exception(f'Class is not supported: {color}')
         
 
-def round_image(color: int):
+def clamp_pixel_value(color: int):
     """
     force integers to be in the range [0, 255]
     """
@@ -157,8 +157,5 @@ def process(img_paths: [str], font_paths: [str], artist: str, song_title: str,  
 
 
 def save_image(img: Image, out_path: str, w_dpi: int, h_dpi: int ):
-    # print(out_path)
-    
     img.thumbnail((w_dpi, h_dpi))
     img.save(out_path)
-    # img.save(out_path, dpi=(h_dpi, w_dpi))
