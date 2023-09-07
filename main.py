@@ -25,9 +25,18 @@ if __name__ == '__main__':
     print('input images', img_paths)
     print('input fonts', font_paths)
 
-    out_img = img.process(img_paths, font_paths, config.ARTIST, config.SONG, config.EXTRACT_MODE)
+    out_img = img.process(img_paths, font_paths, config.ARTIST, config.SONG, config.EXTRACT_MODE, config.COLOR_MODE)
+
     if not out_img.mode.startswith('RGB'):
         out_img = out_img.convert('RGB')
-    out_img.save(config.OUT_DIR + "/img.png")
-    out_img.show()
+
+    out_dir = config.OUT_DIR + "/img.png"
+    if os.name == "nt":
+        # for windows
+        out_dir = out_dir.replace("/", "\\")
+
+    w_dpi = 1200
+    h_dpi = 700
+
+    img.save_image(out_img, out_dir, w_dpi, h_dpi)
 

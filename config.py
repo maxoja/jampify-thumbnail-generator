@@ -23,6 +23,9 @@ VIGNETTE_STR = 0.2
 VIGNETTE_CENTER = (0.25, 0.675)
 VIGNETTE_SCALE = (0.15, 0.2)
 
+COLOR_MODES = ("L", "RGB")
+COLOR_MODE = COLOR_MODES[1]
+
 TEXT_TITLE = {
     TitleConfig.DRAW_AREA: (0.1, 0, 0.9, 0.25),
     TitleConfig.H_ALIGN: HorizontalAlignment.CENTER,

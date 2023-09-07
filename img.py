@@ -67,7 +67,7 @@ def draw_text(img: Image, font_path: str, text: str, text_config) -> Image:
     else:
         raise Exception(f'{text_config[TitleConfig.V_ALIGN]} is not supported')
 
-    draw.text((final_x, final_y), text, font=font, fill=255)
+    draw.text((final_x, final_y), text, font=font, fill=(255, 255, 255))
     return img
 
 
@@ -77,13 +77,34 @@ def round_and_clip_image(image):
     integers in the range [0, 255].
     """
     for i,color in enumerate(image['pixels']):
-        if color < 0: color = 0
-        if color > 255: color = 255
-        image['pixels'][i] = round(color)
+        if type(color) is int:
+            image['pixels'][i] = round_image(color)
+        elif type(color) is list:
+            temp_tuple = []
+            for color_value in color:
+                temp_tuple.append(round_image(color_value))
+            # convert list to tuple because putdata() requires tuple or int
+            image['pixels'][i] = tuple(temp_tuple)
+        else:
+            raise Exception(f'Class is not supported: {color}')
+        
+
+def clamp_pixel_value(color: int):
+    """
+    force integers to be in the range [0, 255]
+    """
+    if color < 0: color = 0
+    if color > 255: color = 255
+    return round(color)
 
 
-def apply_vignette(img: Image):
-    grey = img_diff.load_greyscale_image(img)
+def apply_vignette(img: Image, mode: str):
+    if mode == "L":
+        grey = img_diff.load_greyscale_image(img)
+    elif mode == "RGB":
+        grey = img_diff.load_color_image(img)
+    else:
+        raise Exception(f'Image mode is not supported')
     height = grey['height']
     width = grey['width']
     kernel_width = width*2
@@ -119,18 +140,28 @@ def apply_vignette(img: Image):
             else:
                 coeff = K[i_kernel]
 
-            pixels.append(math.pow(coeff, config.VIGNETTE_STR) * value)
+            if mode == "L":
+                pixels.append(math.pow(coeff, config.VIGNETTE_STR) * value)
+            elif mode == "RGB":
+                pixels.append([math.pow(coeff, config.VIGNETTE_STR) * value_a for value_a in value])
     im = {'height': height, 'width': width, 'pixels': pixels}
     round_and_clip_image(im)
-    out = Image.new(mode='L', size=(im['width'], im['height']))
+    out = Image.new(mode=mode, size=(im['width'], im['height']))
     out.putdata(im['pixels'])
     return out
 
 
-def process(img_paths: [str], font_paths: [str], artist: str, song_title: str,  extract_mode: str) -> Image:
+def process(img_paths: [str], font_paths: [str], artist: str, song_title: str,  extract_mode: str, color_mode: str) -> Image:
+    
     img = Image.open(img_paths[0])
     img = crop(img)
-    img = apply_vignette(img)
+    img = apply_vignette(img, color_mode)
     img = draw_text(img, font_paths[0], f'{artist} - {song_title}', config.TEXT_TITLE)
     img = draw_text(img, font_paths[0], f'{extract_mode}', config.TEXT_EXTRACT)
     return img
+
+
+def save_image(img: Image, out_path: str, w_dpi: int, h_dpi: int ):
+    #for the next PR
+    #img.thumbnail((w_dpi, h_dpi))
+    img.save(out_path)
