@@ -162,5 +162,6 @@ def process(img_paths: [str], font_paths: [str], artist: str, song_title: str,  
 
 
 def save_image(img: Image, out_path: str, w_dpi: int, h_dpi: int ):
-    img.thumbnail((w_dpi, h_dpi))
+    #for the next PR
+    #img.thumbnail((w_dpi, h_dpi))
     img.save(out_path)
