@@ -10,13 +10,13 @@ EXTRACT_MODE = "Instrumental Non Vocal"
 # Vocal Only
 # Instrumental Non Vocal
 
-IMG_TYPES = ["png"]
+IMG_TYPES = ["jpg"]
 FONT_TYPES = ["ttf"]
 
 CROP_RATIO_TUPLE = (16, 9)
 CROP_RATIO = 16/9
-CROP_SCALE = 0.9
-CROP_OFFSET = (0.1, 0.22)
+CROP_SCALE = 1
+CROP_OFFSET = (0, 0.28)
 
 VIGNETTE_STR = 0.2
 # VIGNETTE_CENTER = (0.25, 0.75)
