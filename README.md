@@ -1,4 +1,6 @@
 # jampify-thumbnail-generator
+This project has now moved to a private repo https://github.com/maxoja/jampify-core  
+Further development will be conducted there
 
 ### Requirements
 - Python 3.11.5
